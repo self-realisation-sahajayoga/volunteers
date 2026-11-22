@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sahajayoga Music Programme – Volunteer Management</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1a2233;--muted:#6b7280;--primary:#1f6feb;--success:#1a7f37;--danger:#c62828;--warn:#b26a00;--border:#e5e7eb;--radius:10px;--shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04)}
+*{box-sizing:border-box}html,body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:.8rem}.error-text{color:var(--danger);font-size:.85rem;min-height:1rem;margin:0}
+.auth-view{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#eef2ff,#f8fafc)}
+.auth-card{background:var(--card);padding:32px;border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:400px}
+.auth-card h1{font-size:1.25rem;margin:0 0 6px}.auth-card form{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.auth-card label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted)}
+.auth-card input{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:1rem}
+.auth-card input:focus{outline:2px solid var(--primary);border-color:transparent}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--border);gap:12px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:38px;height:38px;object-fit:contain;border-radius:8px}
+.topbar-right{display:flex;gap:12px;align-items:center}
+.tabs{display:flex;gap:4px;padding:8px 20px;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{background:transparent;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:.9rem;white-space:nowrap}
+.tab:hover{background:#f2f4f7;color:var(--ink)}.tab.active{background:#e8f0fe;color:var(--primary);font-weight:600}
+.content{padding:24px;max-width:1280px;margin:0 auto}h2{margin:0 0 4px;font-size:1.35rem}h3{margin:24px 0 10px;font-size:1.05rem}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.page-head .actions{display:flex;gap:8px;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.card .label{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.card .value{font-size:1.75rem;font-weight:700;margin-top:6px}.card.warn .value{color:var(--warn)}.card.danger .value{color:var(--danger)}.card.success .value{color:var(--success)}
+.table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:#fafbfc;color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}
+tr:last-child td{border-bottom:none}.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.75rem;background:#eef2f6;color:#374151;margin:2px 4px 2px 0}
+.pill.team{background:#e8f0fe;color:#1f6feb}.pill.ok{background:#e6f4ea;color:#1a7f37}.pill.bad{background:#fde8e8;color:#c62828}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;font-size:.88rem;font-weight:500;transition:.15s;text-decoration:none}
+.btn:hover{background:#f2f4f7}.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.primary:hover{filter:brightness(1.05)}
+.btn.danger{background:#fde8e8;color:var(--danger);border-color:#f5c2c2}.btn.danger:hover{background:#fbcfcf}.btn.ghost{background:transparent}
+.btn.small{padding:5px 10px;font-size:.8rem}.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:.92rem;font-family:inherit;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);border-color:transparent}
+textarea{min-height:70px;resize:vertical}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.form-grid label{display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:var(--muted)}.form-grid .full{grid-column:1/-1}
+.search-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}.search-row input{max-width:360px}
+.modal-back{position:fixed;inset:0;background:rgba(15,23,42,.5);display:grid;place-items:center;padding:20px;z-index:50}
+.modal{background:var(--card);border-radius:14px;padding:22px;width:100%;max-width:640px;max-height:90vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal h3{margin-top:0}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.toast{position:fixed;bottom:22px;right:22px;padding:12px 18px;border-radius:10px;color:#fff;font-weight:500;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.toast.success{background:var(--success)}.toast.error{background:var(--danger)}.toast.info{background:var(--primary)}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.spinner{width:22px;height:22px;border:3px solid #e5e7eb;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}.loading-row{display:flex;justify-content:center;padding:30px}
+@media (max-width:640px){.content{padding:14px}.topbar{padding:10px 14px}h2{font-size:1.15rem}.card .value{font-size:1.4rem}th,td{padding:8px}}
+</style>
+</head>
+<body>
+<section id="loginView" class="auth-view">
+  <div class="auth-card">
+    <h1>Sahajayoga Volunteer Management</h1>
+    <p class="muted small">Sahajayoga Music Programme – Yerwada · 29 Nov 2026</p>
+    <form id="loginForm">
+      <label>Email<input type="email" id="loginEmail" required autocomplete="username" /></label>
+      <label>Password<input type="password" id="loginPassword" required autocomplete="current-password" /></label>
+      <button type="submit" class="btn primary">Sign In</button>
+      <p id="loginError" class="error-text"></p>
+    </form>
+  </div>
+</section>
+
+<div id="appView" class="app hidden">
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="logo" class="logo" onerror="this.style.display='none'"/>
+      <div><strong>Sahajayoga Volunteer Management</strong><div class="muted small">Yerwada · 29 Nov 2026</div></div>
+    </div>
+    <div class="topbar-right"><span id="userEmail" class="muted small"></span><button id="btnLogout" class="btn ghost">Logout</button></div>
+  </header>
+  <nav class="tabs" id="mainNav">
+    <button data-view="dashboard" class="tab active">Dashboard</button>
+    <button data-view="volunteers" class="tab">Volunteers</button>
+    <button data-view="teams" class="tab">Teams</button>
+    <button data-view="unallocated" class="tab">Unallocated Volunteers</button>
+    <button data-view="coordinators" class="tab">Coordinators</button>
+    <button data-view="reports" class="tab">Reports</button>
+  </nav>
+  <main id="mainContent" class="content"></main>
+  <div id="toast" class="toast hidden"></div>
+  <div id="modalRoot"></div>
+</div>
+
+<script type="module">
+/* =========================================================
+   YOUR SUPABASE CONFIG — already filled in
+   ========================================================= */
+const SUPABASE_URL = "https://lykipnqivnzejckvgvcw.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_KQc70MXErZft15CeM_2FEQ_O0_tL3gF";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+
+/* ---------- db helpers ---------- */
+const db = {
+  async getPrograms(){const{data,error}=await sb.from('programs').select('*').order('created_at');if(error)throw error;return data},
+  async getTeams(pid){const{data,error}=await sb.from('teams').select('*').eq('program_id',pid).order('display_order');if(error)throw error;return data},
+  async createTeam(t){const{data,error}=await sb.from('teams').insert(t).select().single();if(error)throw error;return data},
+  async updateTeam(id,p){const{data,error}=await sb.from('teams').update(p).eq('id',id).select().single();if(error)throw error;return data},
+  async getVolunteers(){const{data,error}=await sb.from('volunteers').select('*').order('volunteer_name');if(error)throw error;return data},
+  async createVolunteer(v){const{data,error}=await sb.from('volunteers').insert(v).select().single();if(error)throw error;return data},
+  async updateVolunteer(id,p){const{data,error}=await sb.from('volunteers').update(p).eq('id',id).select().single();if(error)throw error;return data},
+  async getAssignments(){const{data,error}=await sb.from('volunteer_assignments').select('id,volunteer_id,team_id,status,assigned_date,assignment_notes');if(error)throw error;return data},
+  async assign(vid,tid,notes='',by=''){const{data,error}=await sb.from('volunteer_assignments').insert({volunteer_id:vid,team_id:tid,assignment_notes:notes,assigned_by:by}).select().single();if(error)throw error;return data},
+  async removeAssignment(id){const{error}=await sb.from('volunteer_assignments').update({status:'inactive'}).eq('id',id);if(error)throw error},
+  async removeAllForVolunteer(vid){const{error}=await sb.from('volunteer_assignments').update({status:'inactive'}).eq('volunteer_id',vid).eq('status','active');if(error)throw error},
+  async getCoordinators(pid){const{data,error}=await sb.from('programme_coordinators').select('*').eq('program_id',pid).order('coordinator_name');if(error)throw error;return data},
+  async createCoordinator(c){const{data,error}=await sb.from('programme_coordinators').insert(c).select().single();if(error)throw error;return data},
+  async updateCoordinator(id,p){const{data,error}=await sb.from('programme_coordinators').update(p).eq('id',id).select().single();if(error)throw error;return data},
+  async deleteCoordinator(id){const{error}=await sb.from('programme_coordinators').delete().eq('id',id);if(error)throw error}
+};
+
+/* ---------- state / dom ---------- */
+const state = { program:null, teams:[], volunteers:[], assignments:[], coordinators:[], currentView:'dashboard', search:'' };
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const el = (tag,props={},...children)=>{const n=document.createElement(tag);Object.entries(props).forEach(([k,v])=>{if(k==='class')n.className=v;else if(k==='html')n.innerHTML=v;else if(k.startsWith('on'))n.addEventListener(k.slice(2),v);else n.setAttribute(k,v)});children.flat().forEach(c=>c&&n.append(c.nodeType?c:document.createTextNode(c)));return n};
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let toastTimer;
+function toast(msg,type='info'){const t=$('#toast');t.textContent=msg;t.className=`toast ${type}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),3200)}
+function openModal({title,body,onConfirm,confirmText='Save',danger=false}){closeModal();const wrap=el('div',{class:'modal-back'});const modal=el('div',{class:'modal'});modal.append(el('h3',{},title));if(typeof body==='string')modal.append(el('div',{html:body}));else modal.append(body);const actions=el('div',{class:'modal-actions'});actions.append(el('button',{class:'btn ghost',onclick:closeModal},'Cancel'));if(onConfirm){const ok=el('button',{class:`btn ${danger?'danger':'primary'}`,onclick:async()=>{try{ok.disabled=true;ok.textContent='Saving...';await onConfirm();closeModal()}catch(e){console.error(e);toast(e.message||'Save failed','error')}finally{ok.disabled=false;ok.textContent=confirmText}}},confirmText);actions.append(ok)}modal.append(actions);wrap.append(modal);$('#modalRoot').append(wrap);wrap.addEventListener('click',e=>{if(e.target===wrap)closeModal()})}
+function closeModal(){$('#modalRoot').innerHTML=''}
+
+/* ---------- derived ---------- */
+const activeTeams=()=>state.teams.filter(t=>t.status==='active');
+const activeVols=()=>state.volunteers.filter(v=>v.status==='active');
+const activeAssignments=()=>state.assignments.filter(a=>a.status==='active');
+const teamsOfVol=id=>activeAssignments().filter(a=>a.volunteer_id===id).map(a=>state.teams.find(t=>t.id===a.team_id)).filter(Boolean);
+const volsOfTeam=id=>activeAssignments().filter(a=>a.team_id===id).map(a=>state.volunteers.find(v=>v.id===a.volunteer_id)).filter(Boolean);
+const unallocated=()=>activeVols().filter(v=>activeAssignments().filter(a=>a.volunteer_id===v.id).length===0);
+
+/* ---------- load ---------- */
+async function loadAll(){
+  const programs=await db.getPrograms();
+  state.program=programs.find(p=>p.status==='active')||programs[0];
+  if(!state.program)throw new Error('No active programme found. Run supabase.sql first.');
+  const[teams,vols,assigns,coords]=await Promise.all([db.getTeams(state.program.id),db.getVolunteers(),db.getAssignments(),db.getCoordinators(state.program.id)]);
+  state.teams=teams;state.volunteers=vols;state.assignments=assigns;state.coordinators=coords;
+}
+
+/* ---------- auth ---------- */
+async function bootAuth(){const{data}=await sb.auth.getSession();if(data.session)showApp(data.session);else showLogin()}
+function showLogin(){$('#loginView').classList.remove('hidden');$('#appView').classList.add('hidden')}
+async function showApp(session){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');$('#userEmail').textContent=session.user?.email||'';try{$('#mainContent').innerHTML='<div class="loading-row"><span class="spinner"></span></div>';await loadAll();render()}catch(e){console.error(e);$('#mainContent').innerHTML=`<div class="empty">Failed to load: ${esc(e.message)}</div>`}}
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#loginEmail').value.trim();const password=$('#loginPassword').value;$('#loginError').textContent='';const btn=e.submitter;if(btn){btn.disabled=true;btn.textContent='Signing in...'}try{const{data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;await showApp(data.session)}catch(err){$('#loginError').textContent=err.message||'Login failed'}finally{if(btn){btn.disabled=false;btn.textContent='Sign In'}}});
+$('#btnLogout').addEventListener('click',async()=>{await sb.auth.signOut();showLogin()});
+sb.auth.onAuthStateChange((_e,s)=>{if(!s)showLogin()});
+
+/* ---------- nav ---------- */
+$('#mainNav').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(!b)return;state.currentView=b.dataset.view;state.search='';$$('#mainNav .tab').forEach(t=>t.classList.toggle('active',t===b));render()});
+function render(){const c=$('#mainContent');switch(state.currentView){case'dashboard':c.innerHTML=renderDashboard();break;case'volunteers':c.innerHTML=renderVolunteers();bindVolunteers();break;case'teams':c.innerHTML=renderTeams();bindTeams();break;case'unallocated':c.innerHTML=renderUnallocated();bindUnallocated();break;case'coordinators':c.innerHTML=renderCoordinators();bindCoordinators();break;case'reports':c.innerHTML=renderReports();bindReports();break}}
+
+/* ---------- dashboard ---------- */
+function renderDashboard(){
+  const teams=activeTeams();const assigns=activeAssignments();const required=teams.reduce((s,t)=>s+(t.required_volunteers||0),0);
+  const rows=teams.map(t=>{const a=volsOfTeam(t.id).length;const r=t.required_volunteers||0;return`<tr><td>${esc(t.team_name)}</td><td>${r}</td><td>${a}</td><td>${Math.max(0,r-a)}</td></tr>`}).join('');
+  return`<div class="page-head"><div><h2>Dashboard</h2><div class="muted small">${esc(state.program.program_name)} · ${state.program.program_date}</div></div></div>
+  <div class="cards">
+    <div class="card"><div class="label">Total Teams</div><div class="value">${teams.length}</div></div>
+    <div class="card"><div class="label">Unique Volunteers</div><div class="value">${activeVols().length}</div></div>
+    <div class="card"><div class="label">Active Assignments</div><div class="value">${assigns.length}</div></div>
+    <div class="card ${unallocated().length?'warn':'success'}"><div class="label">Unallocated</div><div class="value">${unallocated().length}</div></div>
+    <div class="card"><div class="label">Required</div><div class="value">${required}</div></div>
+    <div class="card ${required-assigns.length>0?'danger':'success'}"><div class="label">Shortage</div><div class="value">${Math.max(0,required-assigns.length)}</div></div>
+  </div>
+  <h3>Team-wise Summary</h3>
+  <div class="table-wrap"><table><thead><tr><th>Team</th><th>Required</th><th>Assigned</th><th>Shortage</th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="empty">No teams.</td></tr>'}</tbody></table></div>`;
+}
+
+/* ---------- volunteers ---------- */
+function renderVolunteers(){
+  const q=state.search.toLowerCase();
+  const list=activeVols().filter(v=>!q||v.volunteer_name.toLowerCase().includes(q)||(v.mobile_number||'').includes(q));
+  const rows=list.map((v,i)=>{const ts=teamsOfVol(v.id);const pills=ts.length?ts.map(t=>`<span class="pill team">${esc(t.team_name)}</span>`).join(''):'<span class="pill bad">Unallocated</span>';return`<tr><td>${i+1}</td><td>${esc(v.volunteer_name)}</td><td>${esc(v.mobile_number||'—')}</td><td>${pills}</td><td><span class="pill ${v.status==='active'?'ok':'bad'}">${esc(v.status)}</span></td><td class="actions"><button class="btn small" data-act="edit" data-id="${v.id}">Edit</button> <button class="btn small" data-act="allocate" data-id="${v.id}">Allocate</button> <button class="btn small" data-act="change" data-id="${v.id}">Change Teams</button></td></tr>`}).join('');
+  return`<div class="page-head"><div><h2>Volunteer Master</h2><div class="muted small">${activeVols().length} active volunteers</div></div><div class="actions"><button class="btn primary" id="btnAddVol">+ Add Volunteer</button></div></div>
+  <div class="search-row"><input id="volSearch" placeholder="Search by name or mobile..." value="${esc(state.search)}" /></div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Mobile</th><th>Assigned Teams</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">No volunteers.</td></tr>'}</tbody></table></div>`;
+}
+function bindVolunteers(){
+  $('#btnAddVol').onclick=()=>volunteerForm();
+  $('#volSearch').oninput=e=>{state.search=e.target.value;render();$('#volSearch').focus()};
+  $$('#mainContent [data-act]').forEach(b=>{b.onclick=()=>{const v=state.volunteers.find(x=>x.id===b.dataset.id);if(b.dataset.act==='edit')volunteerForm(v);if(b.dataset.act==='allocate')allocateModal(v);if(b.dataset.act==='change')changeTeamsModal(v)}});
+}
+function volunteerForm(v=null){
+  const isEdit=!!v;const form=el('div',{class:'form-grid'});
+  form.innerHTML=`<label>Volunteer Name *<input id="f_name" value="${esc(v?.volunteer_name||'')}" /></label>
+  <label>Mobile<input id="f_mobile" value="${esc(v?.mobile_number||'')}" /></label>
+  <label>Alternate Mobile<input id="f_alt" value="${esc(v?.alternate_mobile_number||'')}" /></label>
+  <label>Category<select id="f_cat">${['General','Yuva','Camp','Other'].map(c=>`<option ${v?.volunteer_category===c?'selected':''}>${c}</option>`).join('')}</select></label>
+  <label class="full">Notes<textarea id="f_notes">${esc(v?.notes||'')}</textarea></label>`;
+  openModal({title:isEdit?'Edit Volunteer':'Add Volunteer',body:form,confirmText:isEdit?'Update':'Save',onConfirm:async()=>{
+    const data={volunteer_name:$('#f_name').value.trim(),mobile_number:$('#f_mobile').value.trim()||null,alternate_mobile_number:$('#f_alt').value.trim()||null,volunteer_category:$('#f_cat').value,notes:$('#f_notes').value.trim()||null};
+    if(!data.volunteer_name)throw new Error('Name is required');
+    if(isEdit)await db.updateVolunteer(v.id,data);else await db.createVolunteer(data);
+    await loadAll();render();toast(isEdit?'Updated':'Added','success');
+  }});
+}
+function allocateModal(v){
+  const teams=activeTeams();const current=new Set(teamsOfVol(v.id).map(t=>t.id));
+  const box=el('div');
+  box.innerHTML=`<p class="muted small">Select teams for <strong>${esc(v.volunteer_name)}</strong>.</p>
+  <div class="form-grid" style="grid-template-columns:1fr">${teams.map(t=>`<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="${t.id}" ${current.has(t.id)?'checked':''}/><span>${esc(t.team_name)} (${t.required_volunteers} req)</span></label>`).join('')}</div>`;
+  openModal({title:'Allocate to Team(s)',body:box,onConfirm:async()=>{
+    const selected=new Set($$('input[type=checkbox]',box).filter(c=>c.checked).map(c=>c.value));
+    for(const t of teams){const has=current.has(t.id);const want=selected.has(t.id);
+      if(has&&!want){const a=activeAssignments().find(a=>a.volunteer_id===v.id&&a.team_id===t.id);if(a)await db.removeAssignment(a.id)}
+      else if(!has&&want){await db.assign(v.id,t.id)}}
+    await loadAll();render();toast('Assignments updated','success');
+  }});
+}
+function changeTeamsModal(v){
+  const teams=activeTeams();const current=teamsOfVol(v.id);
+  const box=el('div');
+  box.innerHTML=`<p class="muted small">Current: ${current.length?current.map(t=>`<span class="pill team">${esc(t.team_name)}</span>`).join(''):'<em>None</em>'}</p>
+  <div class="table-wrap"><table><thead><tr><th>Team</th><th>Action</th></tr></thead><tbody>${teams.map(t=>{const has=current.find(x=>x.id===t.id);return`<tr><td>${esc(t.team_name)}</td><td>${has?`<button class="btn small danger" data-remove="${t.id}">Remove</button>`:`<button class="btn small" data-add="${t.id}">Add</button>`}</td></tr>`}).join('')}</tbody></table></div>
+  <div style="margin-top:14px"><button class="btn danger" id="btnRemoveAll">Remove All Assignments</button></div>`;
+  setTimeout(()=>{
+    box.querySelectorAll('[data-remove]').forEach(b=>b.onclick=async()=>{const a=activeAssignments().find(a=>a.volunteer_id===v.id&&a.team_id===b.dataset.remove);if(a){await db.removeAssignment(a.id);await loadAll();closeModal();render();toast('Removed','success')}});
+    box.querySelectorAll('[data-add]').forEach(b=>b.onclick=async()=>{await db.assign(v.id,b.dataset.add);await loadAll();closeModal();render();toast('Added','success')});
+    box.querySelector('#btnRemoveAll').onclick=async()=>{if(!confirm('Remove all assignments?'))return;await db.removeAllForVolunteer(v.id);await loadAll();closeModal();render();toast('Removed all','success')};
+  });
+  openModal({title:'Change Team Assignments',body:box});
+}
+
+/* ---------- teams ---------- */
+function renderTeams(){
+  const rows=activeTeams().map(t=>{const a=volsOfTeam(t.id).length;const r=t.required_volunteers||0;return`<tr><td>${esc(t.team_name)}</td><td>${r}</td><td>${a}</td><td>${Math.max(0,r-a)}</td><td class="actions"><button class="btn small" data-act="view" data-id="${t.id}">View</button> <button class="btn small" data-act="edit" data-id="${t.id}">Edit</button> <button class="btn small" data-act="alloc" data-id="${t.id}">Allocate</button> <button class="btn small danger" data-act="deact" data-id="${t.id}">Deactivate</button></td></tr>`}).join('');
+  return`<div class="page-head"><div><h2>Teams</h2><div class="muted small">${activeTeams().length} active teams</div></div><div class="actions"><button class="btn primary" id="btnAddTeam">+ Add Team</button></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Team</th><th>Required</th><th>Assigned</th><th>Shortage</th><th>Actions</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">No teams.</td></tr>'}</tbody></table></div>`;
+}
+function bindTeams(){
+  $('#btnAddTeam').onclick=()=>teamForm();
+  $$('#mainContent [data-act]').forEach(b=>{b.onclick=()=>{const t=state.teams.find(x=>x.id===b.dataset.id);if(b.dataset.act==='view')teamDetails(t);if(b.dataset.act==='edit')teamForm(t);if(b.dataset.act==='alloc')allocateToTeamModal(t);if(b.dataset.act==='deact'){if(confirm(`Deactivate "${t.team_name}"?`))db.updateTeam(t.id,{status:'inactive'}).then(async()=>{await loadAll();render();toast('Deactivated','success')})}}});
+}
+function teamForm(t=null){
+  const isEdit=!!t;const form=el('div',{class:'form-grid'});
+  form.innerHTML=`<label>Team Name *<input id="t_name" value="${esc(t?.team_name||'')}"/></label>
+  <label>Required<input id="t_req" type="number" min="0" value="${t?.required_volunteers??0}"/></label>
+  <label>Work Area<input id="t_area" value="${esc(t?.work_area||'')}"/></label>
+  <label>Display Order<input id="t_order" type="number" value="${t?.display_order??0}"/></label>
+  <label class="full">Responsibilities<textarea id="t_resp">${esc(t?.responsibilities||'')}</textarea></label>`;
+  openModal({title:isEdit?'Edit Team':'Add Team',body:form,confirmText:isEdit?'Update':'Save',onConfirm:async()=>{
+    const data={program_id:state.program.id,team_name:$('#t_name').value.trim(),required_volunteers:parseInt($('#t_req').value||'0',10),work_area:$('#t_area').value.trim()||null,responsibilities:$('#t_resp').value.trim()||null,display_order:parseInt($('#t_order').value||'0',10)};
+    if(!data.team_name)throw new Error('Team name required');
+    if(isEdit)await db.updateTeam(t.id,data);else await db.createTeam(data);
+    await loadAll();render();toast(isEdit?'Updated':'Added','success');
+  }});
+}
+function allocateToTeamModal(t){
+  const vols=activeVols();const assigned=new Set(volsOfTeam(t.id).map(v=>v.id));
+  const box=el('div');
+  box.innerHTML=`<p class="muted small">Add volunteers to <strong>${esc(t.team_name)}</strong>.</p>
+  <div class="form-grid" style="grid-template-columns:1fr;max-height:340px;overflow:auto">${vols.map(v=>`<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" value="${v.id}" ${assigned.has(v.id)?'checked disabled':''}/><span>${esc(v.volunteer_name)} ${v.mobile_number?'· '+esc(v.mobile_number):''}</span></label>`).join('')}</div>`;
+  openModal({title:'Allocate Volunteers',body:box,confirmText:'Add Selected',onConfirm:async()=>{
+    const sel=$$('input[type=checkbox]:not(:disabled)',box).filter(c=>c.checked).map(c=>c.value);
+    for(const id of sel)await db.assign(id,t.id);
+    await loadAll();render();toast(`${sel.length} added`,'success');
+  }});
+}
+function teamDetails(t){
+  const vols=volsOfTeam(t.id);
+  const rows=vols.map((v,i)=>`<tr><td>${i+1}</td><td>${esc(v.volunteer_name)}</td><td>${esc(v.mobile_number||'—')}</td><td><span class="pill ok">${esc(v.status)}</span></td><td><button class="btn small danger" data-rm="${v.id}">Remove</button></td></tr>`).join('');
+  const body=el('div');
+  body.innerHTML=`<p><strong>Work Area:</strong> ${esc(t.work_area||'—')}</p>
+  <p><strong>Required:</strong> ${t.required_volunteers} · <strong>Assigned:</strong> ${vols.length} · <strong>Remaining:</strong> ${Math.max(0,t.required_volunteers-vols.length)}</p>
+  <p><strong>Responsibilities:</strong><br>${esc(t.responsibilities||'—').replace(/\n/g,'<br>')}</p>
+  <h3>Assigned Volunteers</h3>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Mobile</th><th>Status</th><th>Action</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">None assigned.</td></tr>'}</tbody></table></div>
+  <div style="margin-top:14px"><button class="btn" id="addToTeam">+ Add Existing Volunteer</button></div>`;
+  setTimeout(()=>{
+    body.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove from team?'))return;const a=activeAssignments().find(a=>a.volunteer_id===b.dataset.rm&&a.team_id===t.id);if(a){await db.removeAssignment(a.id);await loadAll();closeModal();render();toast('Removed','success')}});
+    body.querySelector('#addToTeam').onclick=()=>{closeModal();allocateToTeamModal(t)};
+  });
+  openModal({title:t.team_name,body});
+}
+
+/* ---------- unallocated ---------- */
+function renderUnallocated(){
+  const list=unallocated();
+  const rows=list.map((v,i)=>`<tr><td>${i+1}</td><td>${esc(v.volunteer_name)}</td><td>${esc(v.mobile_number||'—')}</td><td>${esc(v.volunteer_category)}</td><td><button class="btn small primary" data-id="${v.id}">Allocate</button></td></tr>`).join('');
+  return`<div class="page-head"><div><h2>Volunteers – To Be Allocated</h2><div class="muted small">${list.length} unallocated</div></div></div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Mobile</th><th>Category</th><th>Action</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">All allocated 🎉</td></tr>'}</tbody></table></div>`;
+}
+function bindUnallocated(){$$('#mainContent [data-id]').forEach(b=>{b.onclick=()=>allocateModal(state.volunteers.find(v=>v.id===b.dataset.id))})}
+
+/* ---------- coordinators ---------- */
+function renderCoordinators(){
+  const rows=state.coordinators.map(c=>`<tr><td>${esc(c.coordinator_name)}</td><td>${esc(c.mobile_number||'—')}</td><td>${esc(c.designation||'—')}</td><td><button class="btn small" data-edit="${c.id}">Edit</button> <button class="btn small danger" data-del="${c.id}">Delete</button></td></tr>`).join('');
+  return`<div class="page-head"><div><h2>Programme Coordinators</h2></div><div class="actions"><button class="btn primary" id="btnAddCoord">+ Add Coordinator</button></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th>Designation</th><th>Actions</th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="empty">No coordinators.</td></tr>'}</tbody></table></div>`;
+}
+function bindCoordinators(){
+  $('#btnAddCoord').onclick=()=>coordForm();
+  $$('#mainContent [data-edit]').forEach(b=>b.onclick=()=>coordForm(state.coordinators.find(c=>c.id===b.dataset.edit)));
+  $$('#mainContent [data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete coordinator?'))return;await db.deleteCoordinator(b.dataset.del);await loadAll();render();toast('Deleted','success')});
+}
+function coordForm(c=null){
+  const isEdit=!!c;const f=el('div',{class:'form-grid'});
+  f.innerHTML=`<label>Name *<input id="c_name" value="${esc(c?.coordinator_name||'')}"/></label>
+  <label>Mobile<input id="c_mob" value="${esc(c?.mobile_number||'')}"/></label>
+  <label>Designation<input id="c_desig" value="${esc(c?.designation||'')}"/></label>`;
+  openModal({title:isEdit?'Edit Coordinator':'Add Coordinator',body:f,onConfirm:async()=>{
+    const data={program_id:state.program.id,coordinator_name:$('#c_name').value.trim(),mobile_number:$('#c_mob').value.trim()||null,designation:$('#c_desig').value.trim()||null};
+    if(!data.coordinator_name)throw new Error('Name required');
+    if(isEdit)await db.updateCoordinator(c.id,data);else await db.createCoordinator(data);
+    await loadAll();render();toast('Saved','success');
+  }});
+}
+
+/* ---------- reports ---------- */
+function renderReports(){
+  return`<div class="page-head"><div><h2>Reports & Export</h2></div></div>
+  <div class="cards">
+    <div class="card"><div class="label">Volunteer Master</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary" data-rep="master-csv">CSV</button><button class="btn" data-rep="master-print">Print</button></div></div>
+    <div class="card"><div class="label">Unallocated List</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary" data-rep="unalloc-csv">CSV</button><button class="btn" data-rep="unalloc-print">Print</button></div></div>
+    <div class="card"><div class="label">Team-wise Volunteers</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary" data-rep="team-csv">CSV</button><button class="btn" data-rep="team-print">Print</button></div></div>
+    <div class="card"><div class="label">Required vs Assigned</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary" data-rep="req-csv">CSV</button><button class="btn" data-rep="req-print">Print</button></div></div>
+  </div>`;
+}
+function bindReports(){$$('#mainContent [data-rep]').forEach(b=>b.onclick=()=>runReport(b.dataset.rep))}
+function downloadCSV(filename,rows){const csv=rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url)}
+function printHTML(title,html){const w=window.open('','_blank');w.document.write(`<html><head><title>${title}</title><style>body{font-family:system-ui,Arial;padding:20px}h1{font-size:18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #999;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>${title}</h1>${html}</body></html>`);w.document.close();w.focus();w.print()}
+function runReport(type){
+  const st=(title,headers,rows,filename)=>{if(type.endsWith('csv'))downloadCSV(filename,[headers,...rows]);else{const html=`<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;printHTML(title,html)}};
+  if(type.startsWith('master')){const rows=activeVols().map(v=>[v.volunteer_name,v.mobile_number||'',v.alternate_mobile_number||'',v.volunteer_category,teamsOfVol(v.id).map(t=>t.team_name).join('; ')]);st('Volunteer Master List',['Name','Mobile','Alt Mobile','Category','Teams'],rows,'volunteer_master.csv')}
+  else if(type.startsWith('unalloc')){const rows=unallocated().map(v=>[v.volunteer_name,v.mobile_number||'',v.volunteer_category]);st('Unallocated Volunteers',['Name','Mobile','Category'],rows,'unallocated.csv')}
+  else if(type.startsWith('team')){const rows=[];for(const t of activeTeams()){const vs=volsOfTeam(t.id);if(!vs.length)rows.push([t.team_name,'—','','']);vs.forEach(v=>rows.push([t.team_name,v.volunteer_name,v.mobile_number||'',v.volunteer_category]))}st('Team-wise Volunteers',['Team','Name','Mobile','Category'],rows,'team_wise.csv')}
+  else if(type.startsWith('req')){const rows=activeTeams().map(t=>{const a=volsOfTeam(t.id).length;return[t.team_name,t.required_volunteers,a,Math.max(0,t.required_volunteers-a)]});st('Required vs Assigned',['Team','Required','Assigned','Shortage'],rows,'required_vs_assigned.csv')}
+}
+
+bootAuth();
+</script>
+</body>
+</html>
