@@ -77,6 +77,62 @@
     }
     .logout-btn:hover { background: #52321c; }
 
+    /* Event Coordination Banner */
+    .coord-banner {
+      background: #fff;
+      border-left: 5px solid #6b4226;
+      border-radius: 14px;
+      padding: 0.85rem 1.2rem;
+      margin-bottom: 1.3rem;
+      box-shadow: 0 3px 10px rgba(107,66,38,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem 1rem;
+    }
+    .coord-banner-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b4226;
+      background: #faf1e9;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .coord-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+      color: #3a2a1e;
+    }
+    .coord-chip {
+      background: #fdfbf9;
+      border: 1px solid #e4d9cf;
+      padding: 0.25rem 0.75rem;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .coord-chip strong { font-weight: 600; color: #3a2a1e; }
+    .coord-chip .coord-phone {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #6b4226;
+      background: #f3ece4;
+      padding: 0.05rem 0.45rem;
+      border-radius: 12px;
+      text-decoration: none;
+    }
+    .coord-chip .coord-phone:hover {
+      background: #6b4226;
+      color: #fff;
+    }
+
     #loginOverlay {
       position: fixed;
       inset: 0;
@@ -547,12 +603,14 @@
       padding: 0.6rem 0.5rem; border-bottom: 1px solid #ede4da; vertical-align: middle;
     }
     .manage-table tr:hover { background: #faf6f1; }
-    .manage-table input.inline-edit {
+    .manage-table input.inline-edit,
+    .manage-table select.inline-edit {
       padding: 0.35rem 0.6rem; border: 1px solid #d0c8c0;
       border-radius: 5px; font-size: 0.82rem; width: 100%;
       background: #fff;
     }
-    .manage-table input.inline-edit:focus { outline: none; border-color: #6b4226; }
+    .manage-table input.inline-edit:focus,
+    .manage-table select.inline-edit:focus { outline: none; border-color: #6b4226; }
 
     .loading-overlay {
       position: fixed; inset: 0; background: rgba(245,243,240,0.85);
@@ -631,7 +689,7 @@
        CONFIG
     ============================================ */
     const SUPABASE_URL = "https://tcpackpemmocgvuushyn.supabase.co";
-	const SUPABASE_ANON_KEY = "sb_publishable_cEDrgQjktc8keGMcise6lg_OQuB3Fu2";
+    const SUPABASE_ANON_KEY = "sb_publishable_cEDrgQjktc8keGMcise6lg_OQuB3Fu2";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const ADMIN_EMAIL = "selfrealisationsahajayoga@gmail.com";
 
@@ -897,6 +955,64 @@
     let isAdmin = false;
 
     /* ============================================
+       EVENT COORDINATION TEAM HELPERS
+    ============================================ */
+    function getEventCoordinationTeam() {
+      const coordTeam =
+        teamsStore.find(t => t.id === 'team7') ||
+        teamsStore.find(t => t.name.toLowerCase().includes('event operations') || t.name.toLowerCase().includes('coordination'));
+
+      const teamName = coordTeam?.name || 'Event Operations & Overall Coordination Team';
+      const members = coordTeam
+        ? (volunteersStore[coordTeam.id] || [])
+        : (INITIAL_VOLUNTEERS.team7 || []);
+
+      return { teamName, members };
+    }
+
+    function formatTelHref(mobile) {
+      const digits = String(mobile || '').split('/')[0].replace(/[^0-9+]/g, '');
+      return digits ? `tel:${digits}` : '';
+    }
+
+    function createCoordinationBanner(compact = false) {
+      const { teamName, members } = getEventCoordinationTeam();
+      const banner = document.createElement('div');
+      banner.className = 'coord-banner';
+      if (compact) {
+        banner.style.maxWidth = '1200px';
+        banner.style.margin = '0 auto 1.2rem';
+      }
+
+      const itemsHtml = members.length > 0
+        ? members.map(m => {
+            const cleanMob = (m.mobile || '').trim();
+            const href = formatTelHref(cleanMob);
+            const phoneHtml = cleanMob
+              ? (href
+                  ? `<a class="coord-phone" href="${escapeHtml(href)}">📞 ${escapeHtml(cleanMob)}</a>`
+                  : `<span class="coord-phone">📞 ${escapeHtml(cleanMob)}</span>`)
+              : `<span class="coord-phone" style="opacity:0.65;">No number</span>`;
+            return `<span class="coord-chip"><strong>${escapeHtml(m.name)}</strong> ${phoneHtml}</span>`;
+          }).join('')
+        : `<span style="color:#8b7a6b;font-style:italic;">No members listed yet.</span>`;
+
+      banner.innerHTML = `
+        <span class="coord-banner-title">🎯 ${escapeHtml(teamName)}</span>
+        <div class="coord-list">${itemsHtml}</div>
+      `;
+      return banner;
+    }
+
+    function refreshAllCoordinationBanners() {
+      document.querySelectorAll('.coord-banner').forEach(el => {
+        const isCompact = el.style.maxWidth === '1200px';
+        const fresh = createCoordinationBanner(isCompact);
+        el.replaceWith(fresh);
+      });
+    }
+
+    /* ============================================
        TOAST
     ============================================ */
     function showToast(msg, type = 'info', duration = 3000) {
@@ -941,7 +1057,6 @@
       showLoading(true);
       try {
         let teams = await fetchTeams();
-        // Seed if empty
         if (teams.length === 0) {
           await seedDefaultData();
           teams = await fetchTeams();
@@ -975,7 +1090,6 @@
     }
 
     async function seedDefaultData() {
-      // Insert teams
       const teamRows = DEFAULT_TEAMS.map((t, i) => ({
         id: t.id,
         name: t.name,
@@ -986,7 +1100,6 @@
       const { error: teamErr } = await supabaseClient.from('teams').insert(teamRows);
       if (teamErr) throw teamErr;
 
-      // Insert volunteers
       const volRows = [];
       DEFAULT_TEAMS.forEach(t => {
         const vols = INITIAL_VOLUNTEERS[t.id] || [];
@@ -1087,6 +1200,7 @@
         const panel = document.createElement('div');
         panel.className = 'tab-panel';
         panel.id = `panel-${team.id}`;
+        panel.appendChild(createCoordinationBanner(true));
         panel.appendChild(createTeamCard(team));
         panelsContainer.appendChild(panel);
       });
@@ -1112,6 +1226,7 @@
       if (btn) btn.classList.add('active');
       const panel = document.getElementById(`panel-${teamId}`);
       if (panel) panel.classList.add('active');
+      refreshAllCoordinationBanners();
       if (teamId === 'dashboard') refreshDashboard();
       if (teamId === 'manage') refreshManagePanel();
     }
@@ -1119,19 +1234,25 @@
     function createDashboard() {
       const wrap = document.createElement('div');
       wrap.id = 'dashboardWrap';
+
+      wrap.appendChild(createCoordinationBanner(false));
+
       const summary = document.createElement('div');
       summary.className = 'summary-strip';
       summary.id = 'dashSummary';
       wrap.appendChild(summary);
+
       const title = document.createElement('div');
       title.className = 'dash-section-title';
       title.style.marginTop = '1.8rem';
       title.innerHTML = '📋 Team-wise Volunteer Count';
       wrap.appendChild(title);
+
       const grid = document.createElement('div');
       grid.className = 'dashboard-grid';
       grid.id = 'dashGrid';
       wrap.appendChild(grid);
+
       setTimeout(() => refreshDashboard(), 0);
       return wrap;
     }
@@ -1239,7 +1360,7 @@
       if (isAdmin) {
         const hint = document.createElement('div');
         hint.className = 'admin-hint';
-        hint.textContent = '🔓 You can add, edit, or remove volunteers below.';
+        hint.textContent = '🔓 You can add, edit (including moving teams), or remove volunteers below.';
         container.appendChild(hint);
       }
       if (volunteers.length === 0) {
@@ -1304,8 +1425,60 @@
     };
 
     /* ============================================
-       ADD / EDIT / REMOVE VOLUNTEERS
+       ADD / EDIT / MOVE / REMOVE VOLUNTEERS
     ============================================ */
+    function resolveTargetTeamId(rawInput, fallbackTeamId) {
+      const cleaned = String(rawInput ?? '').trim();
+      if (!cleaned) return fallbackTeamId;
+
+      const byId = teamsStore.find(t => t.id.toLowerCase() === cleaned.toLowerCase());
+      if (byId) return byId.id;
+
+      const num = parseInt(cleaned, 10);
+      if (!isNaN(num) && String(num) === cleaned && num >= 1 && num <= teamsStore.length) {
+        return teamsStore[num - 1].id;
+      }
+
+      const byNameExact = teamsStore.find(t => t.name.toLowerCase() === cleaned.toLowerCase());
+      if (byNameExact) return byNameExact.id;
+
+      const byNamePartial = teamsStore.find(t => t.name.toLowerCase().includes(cleaned.toLowerCase()));
+      if (byNamePartial) return byNamePartial.id;
+
+      return null;
+    }
+
+    async function moveVolunteerToTeam(volObj, sourceTeamId, targetTeamId, updatedFields = null) {
+      const targetList = volunteersStore[targetTeamId] || [];
+      const nextSortOrder = targetList.length;
+
+      const payload = {
+        team_id: targetTeamId,
+        sort_order: nextSortOrder
+      };
+      if (updatedFields) {
+        payload.name = updatedFields.name;
+        payload.mobile = updatedFields.mobile;
+        payload.work_area = updatedFields.workArea;
+      }
+
+      const { error } = await supabaseClient
+        .from('volunteers')
+        .update(payload)
+        .eq('id', volObj.dbId);
+      if (error) throw error;
+
+      // Re-index remaining volunteers in source team so order stays clean
+      const remaining = (volunteersStore[sourceTeamId] || []).filter(item => item.dbId !== volObj.dbId);
+      for (let i = 0; i < remaining.length; i++) {
+        const { error: reorderErr } = await supabaseClient
+          .from('volunteers')
+          .update({ sort_order: i })
+          .eq('id', remaining[i].dbId);
+        if (reorderErr) throw reorderErr;
+      }
+    }
+
     async function addVolunteer(teamId) {
       if (!isAdmin) { showToast('Only admin can add volunteers', 'error'); return; }
       const form = document.getElementById(`add-form-${teamId}`);
@@ -1347,23 +1520,59 @@
       if (!isAdmin) return;
       const v = volunteersStore[teamId]?.[index];
       if (!v) return;
+
       const newName = prompt('Edit volunteer name:', v.name);
       if (newName === null) return;
       const newMobile = prompt('Edit mobile (leave blank to clear):', v.mobile || '');
       if (newMobile === null) return;
       const newWork = prompt('Edit work area (leave blank to clear):', v.workArea || '');
       if (newWork === null) return;
+
+      const currentIdx = teamsStore.findIndex(t => t.id === teamId);
+      const teamChoices = teamsStore.map((t, i) => `${i + 1}. ${t.name}`).join('\n');
+      const teamAnswer = prompt(
+        `Current team: ${currentIdx >= 0 ? `${currentIdx + 1}. ${teamsStore[currentIdx].name}` : teamId}\nEnter new team number (1-${teamsStore.length}) or team name:\n\n${teamChoices}`,
+        currentIdx >= 0 ? String(currentIdx + 1) : teamId
+      );
+      if (teamAnswer === null) return;
+
       if (!newName.trim()) { showToast('Name cannot be empty', 'error'); return; }
-      const { error } = await supabaseClient.from('volunteers').update({
+
+      const targetTeamId = resolveTargetTeamId(teamAnswer, teamId);
+      if (!targetTeamId) {
+        showToast('Could not match that team. Edit cancelled.', 'error');
+        return;
+      }
+
+      const cleanedFields = {
         name: newName.trim(),
         mobile: newMobile.trim(),
-        work_area: newWork.trim()
-      }).eq('id', v.dbId);
-      if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
-      await loadDataFromSupabase();
-      renderTabsAndPanels();
-      switchTab(teamId);
-      showToast('Volunteer updated', 'success');
+        workArea: newWork.trim()
+      };
+
+      try {
+        if (targetTeamId !== teamId) {
+          await moveVolunteerToTeam(v, teamId, targetTeamId, cleanedFields);
+          await loadDataFromSupabase();
+          renderTabsAndPanels();
+          switchTab(targetTeamId);
+          const targetTeam = teamsStore.find(t => t.id === targetTeamId);
+          showToast(`Moved "${cleanedFields.name}" to ${targetTeam ? targetTeam.name : targetTeamId}`, 'success');
+        } else {
+          const { error } = await supabaseClient.from('volunteers').update({
+            name: cleanedFields.name,
+            mobile: cleanedFields.mobile,
+            work_area: cleanedFields.workArea
+          }).eq('id', v.dbId);
+          if (error) throw error;
+          await loadDataFromSupabase();
+          renderTabsAndPanels();
+          switchTab(teamId);
+          showToast('Volunteer updated', 'success');
+        }
+      } catch (err) {
+        showToast('Update failed: ' + err.message, 'error');
+      }
     }
 
     /* ============================================
@@ -1381,6 +1590,8 @@
       const wrap = document.getElementById('manageWrap');
       if (!wrap) return;
       wrap.innerHTML = '';
+
+      wrap.appendChild(createCoordinationBanner(false));
 
       if (isAdmin) {
         const addCard = document.createElement('div');
@@ -1564,6 +1775,7 @@
         openTeamVolunteerEditor(teamId);
         refreshDashboard();
         refreshManagePanel();
+        refreshAllCoordinationBanners();
         showToast(`Added "${name}"`, 'success');
       });
 
@@ -1571,11 +1783,20 @@
       if (vols.length === 0) {
         tableWrap.innerHTML = `<p style="color:#999;font-style:italic;padding:0.5rem 0">No volunteers in this team yet.</p>`;
       } else {
+        const teamOptionsHtml = teamsStore.map((t, idx) =>
+          `<option value="${escapeHtml(t.id)}" ${t.id === teamId ? 'selected' : ''}>${idx + 1}. ${escapeHtml(t.name)}</option>`
+        ).join('');
+
         const table = document.createElement('table');
         table.className = 'manage-table';
         table.innerHTML = `
           <thead><tr>
-            <th style="width:35px">#</th><th>Name</th><th>Mobile</th><th>Work Area</th><th style="width:120px">Actions</th>
+            <th style="width:35px">#</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Work Area</th>
+            <th style="width:210px">Team</th>
+            <th style="width:110px">Actions</th>
           </tr></thead><tbody></tbody>`;
         const tb = table.querySelector('tbody');
         vols.forEach((v, idx) => {
@@ -1585,6 +1806,7 @@
             <td><input type="text" class="inline-edit vol-name" data-index="${idx}" value="${escapeHtml(v.name)}" /></td>
             <td><input type="text" class="inline-edit vol-mobile" data-index="${idx}" value="${escapeHtml(v.mobile || '')}" /></td>
             <td><input type="text" class="inline-edit vol-work" data-index="${idx}" value="${escapeHtml(v.workArea || '')}" /></td>
+            <td><select class="inline-edit vol-team" data-index="${idx}">${teamOptionsHtml}</select></td>
             <td>
               <button class="btn-brown vol-save" data-index="${idx}" style="padding:0.3rem 0.7rem;font-size:0.7rem">💾</button>
               <button class="btn-red vol-del" data-index="${idx}" style="padding:0.3rem 0.7rem;font-size:0.7rem;margin-left:0.2rem">🗑</button>
@@ -1600,17 +1822,35 @@
             const name = tb.querySelector(`.vol-name[data-index="${i}"]`).value.trim();
             const mobile = tb.querySelector(`.vol-mobile[data-index="${i}"]`).value.trim();
             const work = tb.querySelector(`.vol-work[data-index="${i}"]`).value.trim();
+            const targetTeamId = tb.querySelector(`.vol-team[data-index="${i}"]`).value;
             if (!name) { showToast('Name required', 'error'); return; }
             const v = volunteersStore[teamId][i];
-            const { error } = await supabaseClient.from('volunteers').update({
-              name, mobile, work_area: work
-            }).eq('id', v.dbId);
-            if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
-            await loadDataFromSupabase();
-            openTeamVolunteerEditor(teamId);
-            refreshDashboard();
-            refreshManagePanel();
-            showToast('Volunteer updated', 'success');
+
+            try {
+              if (targetTeamId && targetTeamId !== teamId) {
+                await moveVolunteerToTeam(v, teamId, targetTeamId, { name, mobile, workArea: work });
+                await loadDataFromSupabase();
+                refreshDashboard();
+                refreshManagePanel();
+                refreshAllCoordinationBanners();
+                openTeamVolunteerEditor(targetTeamId);
+                const targetTeam = teamsStore.find(t => t.id === targetTeamId);
+                showToast(`Moved "${name}" to ${targetTeam ? targetTeam.name : targetTeamId}`, 'success');
+              } else {
+                const { error } = await supabaseClient.from('volunteers').update({
+                  name, mobile, work_area: work
+                }).eq('id', v.dbId);
+                if (error) throw error;
+                await loadDataFromSupabase();
+                openTeamVolunteerEditor(teamId);
+                refreshDashboard();
+                refreshManagePanel();
+                refreshAllCoordinationBanners();
+                showToast('Volunteer updated', 'success');
+              }
+            } catch (err) {
+              showToast('Update failed: ' + err.message, 'error');
+            }
           });
         });
         tb.querySelectorAll('.vol-del').forEach(btn => {
@@ -1624,6 +1864,7 @@
             openTeamVolunteerEditor(teamId);
             refreshDashboard();
             refreshManagePanel();
+            refreshAllCoordinationBanners();
             showToast('Volunteer removed', 'info');
           });
         });
